@@ -1,70 +1,56 @@
-function getComputerChoice() {
-    let rock = "Rock"
-    let paper = "Paper"
-    let scissors ="Scissors"
-    let randomValue = Math.random();
-   if (randomValue <= 0.33) {
-        return rock
-   } else if (randomValue <= 0.66) {
-    return paper 
 
-   } else return scissors;
- }
-function game() {
-   let roundsPlayed = 0;
-   let playerWins = 0;
-   let computerWins = 0 ;
-   gameWinner="";
-   while (roundsPlayed <5 ){
-    roundsPlayed++;
-    const computerSelection = getComputerChoice();
-    let playerSelection = prompt("Chose one of them(Rock, Paper, Scissors)");
-   console.log(roundPlay(letterCap(playerSelection), computerSelection))
-    console.log("Player wins: " + playerWins);
-    console.log("Computer wins: " + computerWins);
+    const selectionButtons =document.querySelectorAll('[data-selection]')
+    const finalColumn = document.querySelector('[data-final-column]')
+    const computerScoreSpan = document.querySelector('[data-computer-score]')
+    const playerScoreSpan = document.querySelector('[data-your-score]')
+    const SELECTIONS = [
+      { name: 'Rock',
+        emoji: '🌑',
+        beats: 'Scissors'
+      }, 
+      { name: 'Paper',
+        emoji: '📜',
+        beats: 'Rock'
+      },
+      { name: 'Scissors',
+        emoji: '✂️',
+        beats: 'Paper'
+      }
+    ]
+    selectionButtons.forEach(selectionButton => {
+        selectionButton.addEventListener('click', e  => {
+        const selectionName = selectionButton.dataset.selection
+        const selection = SELECTIONS.find(selection=> selection.name === selectionName)
+        makeSelection(selection)
+    });
+})
+ function makeSelection(selection){
+    const computerSelection = randomSelection()
+    const yourWinner = isWinner(selection, computerSelection)
+    const computerWinner = isWinner(computerSelection, selection)
     
-  
- 
- function roundPlay(playerSelection, computerSelection) {
-    let tie= "It's a tie! " + playerSelection + " vs " + computerSelection + "."
-    let playerWin= "You Win! " + playerSelection + " beats " + computerSelection + "."
-    let computerWin= "You Lose! " + playerSelection + " lose against " + computerSelection + "."
-           if (playerSelection === computerSelection){
-        return tie;
-    } else if ((playerSelection === "Rock") && (computerSelection === "Scissors")){
-        playerWins++
-        return playerWin;
-    } else if  ((playerSelection === "Scissors") && (computerSelection === "Rock")){
-        computerWins++
-        return computerWin;
-    } else if ((playerSelection === "Paper") && (computerSelection === "Rock")){
-         playerWins++
-        return playerWin;
-    } else if ((playerSelection === "Paper") && (computerSelection === "Scissors")){
-        computerWins++
-        return computerWin;
-    } else if ((playerSelection === "Scissors") && (computerSelection === "Paper")){
-        playerWins++
-        return playerWin;
-    } else if ((playerSelection === "Rock") && (computerSelection === "Paper")){
-        computerWins++
-     return computerWin;
-    }
+
+    addSelectionResult(computerSelection, computerWinner)
+    addSelectionResult(selection, yourWinner )
+   if (yourWinner) incrementScore(playerScoreSpan)
+   if (computerWinner) incrementScore(computerScoreSpan)
+}
+function incrementScore(scoreSpan) {
+scoreSpan.innerText = parseInt(scoreSpan.innerText) +1
+}
+
+function addSelectionResult(selection, winner) {
+    const div = document.createElement('div')
+    div.innerText = selection.emoji
+    div.classList.add('result-selection')
+    if (winner) div.classList.add('winner')
+    finalColumn.after(div)
   }
-}  if (playerWins > computerWins){
-        gameWinner = "YOU WIN";
-    } else if ( playerWins < computerWins) {
-        gameWinner = "Computer win";
-    } else gameWinner = " It's a Tie";
-    console.log("The five rounds game winner is: " + gameWinner );
   
-
- function letterCap(playerSelection) {
-    let allLowerCase = playerSelection.toLowerCase()
-    let firstLatterCap = allLowerCase.charAt(0).toUpperCase() + allLowerCase.slice(1)
-    return firstLatterCap;
-   }
- }
-game();
- 
-
+ function isWinner(selection, opponentSelection) {
+ return selection.beats === opponentSelection.name 
+}
+ function randomSelection(){
+    const randomIndex = Math.floor(Math.random() * SELECTIONS.length)
+return SELECTIONS[randomIndex]
+}
